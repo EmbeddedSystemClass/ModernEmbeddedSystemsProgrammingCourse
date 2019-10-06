@@ -10,7 +10,12 @@ typedef struct {
     uint16_t x;
 } Point;
 
-Point p1, p2;
+Point p1 = {
+    123U,
+    0x1234U
+};
+
+Point p2;
 
 typedef struct {
     Point top_left;
@@ -21,8 +26,22 @@ typedef struct {
     Point corners[3];
 } Triangle;
 
-Window w, w2;
+Window w = {
+    { 123U, 0x1234U },
+    { 234U, 0x6789U }
+};
+Window w2;
 Triangle t;
+
+int16_t x = -1;
+uint32_t y = 0x0000DEADU;
+
+int16_t sqr[8] = {
+    1 * 1,
+    2 * 2,
+    3 * 3,
+    4 * 4
+};
 
 /******************************************************************************/
 void main(void)

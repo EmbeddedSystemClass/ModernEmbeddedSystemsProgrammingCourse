@@ -5,153 +5,67 @@
 #define PIN8 (1U << 8)
 #define PIN9 (1U << 9)
 
-#define STM32_GPIOC8 (unsigned int volatile *)(0x42000000U + 0x1100CU * 32U + 8U * 4U)
-#define STM32_GPIOC9 (unsigned int volatile *)(0x42000000U + 0x1100CU * 32U + 9U * 4U)
+typedef struct {
+    uint8_t y;
+    uint16_t x;
+} Point;
 
-unsigned int volatile * const output[2] = {
-    (unsigned int volatile *)(0x42000000U + 0x1100CU * 32U + 8U * 4U),
-    (unsigned int volatile *)(0x42000000U + 0x1100CU * 32U + 9U * 4U)
-};
+Point p1, p2;
 
-void gpio_high(unsigned int volatile * gpio);
-void gpio_low(unsigned int volatile * gpio);
+typedef struct {
+    Point top_left;
+    Point bottom_right;
+} Window;
 
-unsigned int fact(unsigned int n);
+typedef struct {
+    Point corners[3];
+} Triangle;
 
-/******************************************************************************/
-void gpio_high(unsigned int volatile * gpio)
-/******************************************************************************/
-{
-    *gpio = 1U;
-}
-
-/******************************************************************************/
-void gpio_low(unsigned int volatile * gpio)
-/******************************************************************************/
-{
-    *gpio = 0U;
-}
-
-int * swap(int * x, int * y);
-
-/******************************************************************************/
-int * swap(int * x, int * y)
-/******************************************************************************/
-{
-    static int tmp[2];
-
-    tmp[0] = *x;
-    tmp[1] = *y;
-
-    *x = tmp[1];
-    *y = tmp[0];
-
-    return tmp;
-}
-
-uint8_t u8a, u8b;
-uint16_t u16c, u16d;
-uint32_t u32e, u32f;
-
-int8_t s8;
-int16_t s16;
-int32_t s32;
+Window w, w2;
+Triangle t;
 
 /******************************************************************************/
 void main(void)
 /******************************************************************************/
 {
-    u8a = sizeof(u8a);
-    u16c = sizeof(uint16_t);
-    u32e = sizeof(uint32_t);
+    Point * pp;
+    Window * wp;
 
-    u8a = 0xA1U;
-    u16c = 0xC1C2U;
-    u32e = 0xE1E2E3E4U;
+    p1.x = sizeof(Point);
+    p1.y = p1.x - 2U;
 
-    u8b = u8a;
-    u16d = u16c;
-    u32f = u32e;
+    w.top_left.x = 1U;
+    w.top_left.y = 2U;
 
-    /* C always promotes smaller sizes to int, so in the case of
-     * 32 bit core, u16 will be promoted to uin32_t and the computation
-     * will be performed on 32 bits sizes variables, which will yield
-     * the correct result.
-     * On the other hand, u16d on 16 bit machine will be promoted to 16 bit int,
-     * and the computation will be performed on 16 bit variables.
-     * This will yield incorrect result, because it will overflow / will be
-     * truncated to 16 bit.
-     * The size of the computation does not depend on the left hand side assignment,
-     * but solely on the types of variables on the right hand side.
-     * Actually, the types will be promoted to the biggest type taking place
-     * in the computation. */
-    u16c = 40000U;
-    u16d = 30000U;
+    t.corners[0].x = 1U;
+    t.corners[2].y = 2U;
 
-    u32e = (uint32_t)u16c + (uint32_t)u16d;
+    p2 = p1;
+    w2 = w;
 
-    u16c = 100;
-    s32 = 10 - (int16_t)u16c;
+    pp = &p1;
+    wp = &w2;
 
-    u8a = 0xFFU;
+    (*pp).x = 1U;
+    (*wp).top_left = *pp;
 
-    if ((uint8_t)(~u8a) == 0x00U)
-    {
-        asm("nop");
-    }
-    else
-    {
-        asm("nop");
-    }
+    pp->x = 1U;
+    wp->top_left = *pp;
 
     RCC->APB2ENR |= 0x01U << 4; /* Enable GPIOF clock.  */
     GPIOC->CRH    = (0x01U << 0) | /* GPIOC8 as PP output. */
                     (0x01U << 4);  /* GPIOC9 as PP output. */
 
-
-    int x = 2*240000;
-    int y = 2*240000 / 2;
-
-
     while (1)
     {
-        int * p;
+        GPIOC->BSRR = PIN8;
+        GPIOC->BRR = PIN9;
 
-        p = swap(&y, &x);
+        delay(240000);
 
-        gpio_high(STM32_GPIOC8);
-        *(output[1]) = 0;
+        GPIOC->BRR = PIN8;
+        GPIOC->BSRR = PIN9;
 
-        delay(p[0]);
-
-        gpio_low(STM32_GPIOC8);
-        *(output[1]) = 1;
-
-        delay(p[1]);
+        delay(240000);
     }
-}
-
-/******************************************************************************/
-unsigned int fact(unsigned int n)
-/******************************************************************************/
-{
-    /* 0! = 1, for n = 0.
-     * n! = n * (n - 1)! for n > 0. */
-
-    unsigned int retval;
-    unsigned int foo[6];
-
-    foo[n] = n;
-
-
-    if (0U == n)
-    {
-        retval = 1U;
-    }
-    else
-    {
-        retval = foo[n] * fact(n - 1U);
-    }
-
-    return retval;
 }

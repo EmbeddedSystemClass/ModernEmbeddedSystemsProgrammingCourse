@@ -1,19 +1,29 @@
-int counter = 0;
+#include "stm32f10x.h"
 
 /******************************************************************************/
 int main(void)
 /******************************************************************************/
 {
-    *((unsigned int volatile *)(0x40021000U + 0x18U)) |= 1U << 4;
+    int volatile counter;
 
-    *((unsigned int volatile *)(0x40011000U + 0x04U)) = 0x01U;
+    RCC->APB2ENR |= 0x01U << 4; /* Enable GPIOF clock.  */
+    GPIOC->CRH    = 0x01U;      /* GPIOF8 as PP output. */
 
     while (1)
     {
-        *((unsigned int volatile *)(0x40011000U + 0x10U)) |= 1U << 8;
-        for (int i = 0; i < 240000; ++i) asm("nop");
-        *((unsigned int volatile *)(0x40011000U + 0x14U)) |= 1U << 8;
-        for (int i = 0; i < 240000; ++i) asm("nop");
+        GPIOC->BSRR = 1U << 8; /* GPIOC8 high. */
+        counter = 0;
+        while (counter < 240000)
+        {
+            ++counter;
+        }
+
+        GPIOC->BRR  = 1U << 8; /* GPIOC8 low. */
+        counter = 0;
+        while (counter < 240000)
+        {
+            ++counter;
+        }
     }
 
     return 0;

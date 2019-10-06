@@ -132,7 +132,7 @@
         </option>
         <option>
           <name>OGUseCmsis</name>
-          <state>0</state>
+          <state>1</state>
         </option>
         <option>
           <name>OGUseCmsisDspLib</name>
@@ -185,7 +185,7 @@
         </option>
         <option>
           <name>CCDefines</name>
-          <state></state>
+          <state>STM32F10X_MD_VL</state>
         </option>
         <option>
           <name>CCPreprocFile</name>
@@ -339,7 +339,7 @@
         <option>
           <name>CCOptStrategy</name>
           <version>0</version>
-          <state>0</state>
+          <state>2</state>
         </option>
         <option>
           <name>CCOptLevelSlave</name>
@@ -414,7 +414,7 @@
         <option>
           <name>CCOptStrategySlave</name>
           <version>0</version>
-          <state>0</state>
+          <state>2</state>
         </option>
         <option>
           <name>CCGuardCalls</name>
@@ -1930,6 +1930,9 @@
   </configuration>
   <file>
     <name>$PROJ_DIR$\main.c</name>
+  </file>
+  <file>
+    <name>$PROJ_DIR$\stm32f10x.h</name>
   </file>
 </project>
 

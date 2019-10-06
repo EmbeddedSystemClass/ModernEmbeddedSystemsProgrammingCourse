@@ -1,6 +1,5 @@
 #include <stdint.h> /* The most important addition to C99! */
 #include "stm32f10x.h"
-#include "delay.h"
 
 void SysTick_Handler(void);
 
@@ -21,9 +20,12 @@ void main(void)
     SysTick->LOAD = (8000000U - 1U);
     SysTick->CTRL = (1U << 2) | (1U << 1) | (1U << 0);
 
+    SysTick_Handler();
+
     while (1)
     {
-        asm("nop");
+        GPIOC->BSRR = PIN9;
+        GPIOC->BRR  = PIN9;
     }
 }
 
@@ -32,5 +34,4 @@ void SysTick_Handler(void)
 /******************************************************************************/
 {
     GPIOC->ODR ^= PIN8;
-    GPIOC->ODR ^= PIN9;
 }

@@ -2324,6 +2324,9 @@
     <name>$PROJ_DIR$\main.c</name>
   </file>
   <file>
+    <name>$PROJ_DIR$\startup_stm32f100.c</name>
+  </file>
+  <file>
     <name>$PROJ_DIR$\stm32f10x.h</name>
   </file>
 </project>

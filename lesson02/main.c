@@ -3,25 +3,16 @@ int main(void)
 /******************************************************************************/
 {
     unsigned int counter = 0;
-    ++counter;
-    ++counter;
-    ++counter;
-    ++counter;
-    ++counter;
-    ++counter;
-    ++counter;
-    ++counter;
-    ++counter;
-    ++counter;
-    ++counter;
-    ++counter;
-    ++counter;
-    ++counter;
-    ++counter;
-    ++counter;
-    ++counter;
-    ++counter;
-    ++counter;
+
+    while (counter < 21)
+    {
+        ++counter;
+
+        if ((counter & 1) != 0)
+        {
+            asm("nop");
+        }
+    }
 
     return 0;
 }

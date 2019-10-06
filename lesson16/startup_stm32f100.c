@@ -1,6 +1,10 @@
-/* Startup code for STM32F100. */
+/******************************************************************************/
+/* Startup code for STM32F100.                                                */
+/******************************************************************************/
 
 #include "bsp.h"
+
+typedef void (* Handler_Func_t)(void);
 
 extern void CSTACK$$Limit;
 void __iar_program_start(void);
@@ -17,24 +21,24 @@ void SysTick_Handler(void);
 void Unused_Handler(void);
 
 /******************************************************************************/
-int const __vector_table[] @ ".intvec" = {
+Handler_Func_t const __vector_table[] @ ".intvec" = {
 /******************************************************************************/
-    (int) &CSTACK$$Limit,
-    (int) &__iar_program_start,
-    (int) &NMI_Handler,
-    (int) &HardFault_Handler,
-    (int) &MemManage_Handler,
-    (int) &BusFault_Handler,
-    (int) &UsageFault_Handler,
-          0, /* Reserved. */
-          0, /* Reserved. */
-          0, /* Reserved. */
-          0, /* Reserved. */
-    (int) &SVC_Handler,
-    (int) &DebugMon_Handler,
-          0, /* Reserved. */
-    (int) &PendSV_Handler,
-    (int) &SysTick_Handler
+    (Handler_Func_t) &CSTACK$$Limit,
+    &__iar_program_start,
+    &NMI_Handler,
+    &HardFault_Handler,
+    &MemManage_Handler,
+    &BusFault_Handler,
+    &UsageFault_Handler,
+    0, /* Reserved. */
+    0, /* Reserved. */
+    0, /* Reserved. */
+    0, /* Reserved. */
+    &SVC_Handler,
+    &DebugMon_Handler,
+    0, /* Reserved. */
+    &PendSV_Handler,
+    &SysTick_Handler
 };
 
 /******************************************************************************/

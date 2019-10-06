@@ -1,4 +1,5 @@
 #include "stm32f10x.h"
+#include "delay.h"
 
 #define PIN8 (1U << 8)
 #define PIN9 (1U << 9)
@@ -13,7 +14,8 @@ unsigned int volatile * const output[2] = {
 
 void gpio_high(unsigned int volatile * gpio);
 void gpio_low(unsigned int volatile * gpio);
-void delay(int iter);
+
+unsigned int fact(unsigned int n);
 
 /******************************************************************************/
 void gpio_high(unsigned int volatile * gpio)
@@ -30,21 +32,15 @@ void gpio_low(unsigned int volatile * gpio)
 }
 
 /******************************************************************************/
-void delay(int iter)
-/******************************************************************************/
-{
-    int volatile counter = 0;
-
-    while (counter < iter)
-    {
-        ++counter;
-    }
-}
-
-/******************************************************************************/
 int main(void)
 /******************************************************************************/
 {
+    unsigned int volatile x;
+
+    x = fact(0U);
+    x = 2U + 3U * fact(1U);
+    (void) fact(5U);
+
     RCC->APB2ENR |= 0x01U << 4; /* Enable GPIOF clock.  */
     GPIOC->CRH    = (0x01U << 0) | /* GPIOC8 as PP output. */
                     (0x01U << 4);  /* GPIOC9 as PP output. */
@@ -63,4 +59,24 @@ int main(void)
     }
 
     /* return 0; */
+}
+
+/******************************************************************************/
+unsigned int fact(unsigned int n)
+/******************************************************************************/
+{
+    unsigned int retval;
+    /* 0! = 1, for n = 0.
+     * n! = n * (n - 1)! for n > 0. */
+
+    if (0U == n)
+    {
+        retval = 1U;
+    }
+    else
+    {
+        retval = n * fact(n - 1U);
+    }
+
+    return retval;
 }

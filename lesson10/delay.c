@@ -1,13 +1,13 @@
 #include "delay.h"
 
 /******************************************************************************/
-void delay(int iter)
+void delay(int volatile iter)
 /******************************************************************************/
 {
-    int volatile counter = 0;
+    //int volatile counter = 0;
 
-    while (counter < iter)
+    while (iter > 0)
     {
-        ++counter;
+        --iter;
     }
 }

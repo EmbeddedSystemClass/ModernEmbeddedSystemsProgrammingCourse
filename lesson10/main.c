@@ -31,43 +31,66 @@ void gpio_low(unsigned int volatile * gpio)
     *gpio = 0U;
 }
 
+int * swap(int * x, int * y);
+
 /******************************************************************************/
-int main(void)
+int * swap(int * x, int * y)
 /******************************************************************************/
 {
-    unsigned int volatile x;
+    static int tmp[2];
 
-    x = fact(0U);
-    x = 2U + 3U * fact(1U);
-    (void) fact(5U);
+    tmp[0] = *x;
+    tmp[1] = *y;
 
+    *x = tmp[1];
+    *y = tmp[0];
+
+    return tmp;
+}
+
+/******************************************************************************/
+void main(void)
+/******************************************************************************/
+{
     RCC->APB2ENR |= 0x01U << 4; /* Enable GPIOF clock.  */
     GPIOC->CRH    = (0x01U << 0) | /* GPIOC8 as PP output. */
                     (0x01U << 4);  /* GPIOC9 as PP output. */
 
+
+    int x = 2*240000;
+    int y = 2*240000 / 2;
+
+
     while (1)
     {
+        int * p;
+
+        p = swap(&y, &x);
+
         gpio_high(STM32_GPIOC8);
         *(output[1]) = 0;
 
-        delay(240000);
+        delay(p[0]);
 
         gpio_low(STM32_GPIOC8);
         *(output[1]) = 1;
 
-        delay(120000);
+        delay(p[1]);
     }
-
-    /* return 0; */
 }
 
 /******************************************************************************/
 unsigned int fact(unsigned int n)
 /******************************************************************************/
 {
-    unsigned int retval;
     /* 0! = 1, for n = 0.
      * n! = n * (n - 1)! for n > 0. */
+
+    unsigned int retval;
+    unsigned int foo[6];
+
+    foo[n] = n;
+
 
     if (0U == n)
     {
@@ -75,7 +98,7 @@ unsigned int fact(unsigned int n)
     }
     else
     {
-        retval = n * fact(n - 1U);
+        retval = foo[n] * fact(n - 1U);
     }
 
     return retval;

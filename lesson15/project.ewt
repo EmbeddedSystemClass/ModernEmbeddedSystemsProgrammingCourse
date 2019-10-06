@@ -2315,6 +2315,12 @@
     </settings>
   </configuration>
   <file>
+    <name>$PROJ_DIR$\bsp.c</name>
+  </file>
+  <file>
+    <name>$PROJ_DIR$\bsp.h</name>
+  </file>
+  <file>
     <name>$PROJ_DIR$\delay.c</name>
   </file>
   <file>
@@ -2322,6 +2328,9 @@
   </file>
   <file>
     <name>$PROJ_DIR$\main.c</name>
+  </file>
+  <file>
+    <name>$PROJ_DIR$\project.icf</name>
   </file>
   <file>
     <name>$PROJ_DIR$\startup_stm32f100.c</name>

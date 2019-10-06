@@ -4,17 +4,17 @@ int counter = 0;
 int main(void)
 /******************************************************************************/
 {
-    int * p_int;
+    *((unsigned int volatile *)(0x40021000U + 0x18U)) |= 1U << 4;
 
-    p_int = &counter;
+    *((unsigned int volatile *)(0x40011000U + 0x04U)) = 0x01U;
 
-    while (*p_int < 21)
+    while (1)
     {
-        ++(*p_int);
+        *((unsigned int volatile *)(0x40011000U + 0x10U)) |= 1U << 8;
+        for (int i = 0; i < 240000; ++i) asm("nop");
+        *((unsigned int volatile *)(0x40011000U + 0x14U)) |= 1U << 8;
+        for (int i = 0; i < 240000; ++i) asm("nop");
     }
-
-    p_int = (int *)0x20000002;
-    *p_int = 0xDEADBEEF;
 
     return 0;
 }

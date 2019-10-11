@@ -7,10 +7,10 @@ void SysTick_Handler(void);
 #define PIN9 (1U << 9)
 
 /******************************************************************************/
-void main(void)
+int main(void)
 /******************************************************************************/
 {
-    RCC->APB2ENR |= 0x01U << 4; /* Enable GPIOF clock.  */
+    RCC->APB2ENR |= 0x01U << 4; /* Enable GPIOC clock.  */
     GPIOC->CRH    = (0x01U << 0) | /* GPIOC8 as PP output. */
                     (0x01U << 4);  /* GPIOC9 as PP output. */
 
@@ -27,6 +27,8 @@ void main(void)
         GPIOC->BSRR = PIN9;
         GPIOC->BRR  = PIN9;
     }
+
+    return 0;
 }
 
 /******************************************************************************/

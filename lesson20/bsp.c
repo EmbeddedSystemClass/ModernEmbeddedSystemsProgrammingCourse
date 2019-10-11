@@ -8,3 +8,10 @@ __attribute__((naked)) void assert_failed(char const * p_name, int const line)
     /* TBD: damage control. */
     //NVIC_SystemReset(); /* Reset the system. */
 }
+
+/******************************************************************************/
+void SysTick_Handler(void)
+/******************************************************************************/
+{
+    GPIOC->ODR ^= PIN8;
+}

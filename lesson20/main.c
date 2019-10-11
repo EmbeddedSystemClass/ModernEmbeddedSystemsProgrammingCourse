@@ -1,10 +1,6 @@
 #include <stdint.h> /* The most important addition to C99! */
 #include "stm32f10x.h"
-
-void SysTick_Handler(void);
-
-#define PIN8 (1U << 8)
-#define PIN9 (1U << 9)
+#include "bsp.h"
 
 /******************************************************************************/
 int main(void)
@@ -26,14 +22,15 @@ int main(void)
     {
         GPIOC->BSRR = PIN9;
         GPIOC->BRR  = PIN9;
+
+        //__disable_irq();
+        //GPIOC->ODR = GPIOC->ODR |  PIN9;
+        //__enable_irq();
+
+        //__disable_irq();
+        //GPIOC->ODR = GPIOC->ODR & ~PIN9;
+        //__enable_irq();
     }
 
     return 0;
-}
-
-/******************************************************************************/
-void SysTick_Handler(void)
-/******************************************************************************/
-{
-    GPIOC->ODR ^= PIN8;
 }

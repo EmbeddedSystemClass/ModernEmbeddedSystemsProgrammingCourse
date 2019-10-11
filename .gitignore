@@ -1,3 +1,5 @@
 */Debug
 */*.dep
 */settings
+
+*/.code_review_properties

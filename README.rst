@@ -38,3 +38,7 @@ You can use the code from this repo for your own inspiration,
 should you need to run the lectures on a different hardware.
 
 Go grab it and have fun!
+
+I'm using the following IDEs and/or toolchains throughout the course:
+
+* lesson 1 - 18: IAR Embedded Workbench for ARM 7.80.

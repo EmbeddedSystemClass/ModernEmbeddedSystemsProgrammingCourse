@@ -1,4 +1,5 @@
 I am taking classes in the excellent Modern Embedded Systems Programming Course.
+
 Go check it out here: https://www.state-machine.com/quickstart/
 
 This repository contains source code and project files that I develop as I
@@ -35,4 +36,5 @@ will make you feel like having an extraordinary journey.
 
 You can use the code from this repo for your own inspiration,
 should you need to run the lectures on a different hardware.
+
 Go grab it and have fun!

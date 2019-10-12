@@ -41,5 +41,6 @@ Go grab it and have fun!
 
 I'm using the following IDEs and/or toolchains throughout the course:
 
-* lesson  1 - 18: IAR Embedded Workbench for ARM 7.80,
-* lesson 19 - 20: STM32CubeIDE 1.0.1 (Eclipse + GCC).
+* lesson  1 - 18:  IAR Embedded Workbench for ARM 7.80,
+* lesson 19 - 20:  STM32CubeIDE 1.0.1 (Eclipse + GCC),
+* lesson 21 - now: Keil uVision 5.28.

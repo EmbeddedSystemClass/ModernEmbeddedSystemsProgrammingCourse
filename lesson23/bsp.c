@@ -1,6 +1,7 @@
 /* Board Support Package (BSP) for the STM32VLDISCOVERY board */
 #include <stdint.h>  /* Standard integers. WG14/N843 C99 Standard */
 
+#include "miros.h"
 #include "bsp.h"
 #include "stm32f10x.h" /* Device Peripheral Access Layer. */
 #include "system_stm32f10x.h"
@@ -16,6 +17,10 @@ void SysTick_Handler(void)
 /******************************************************************************/
 {
    ++l_tickCtr;
+
+    __disable_irq();
+    OS_sched();
+    __enable_irq();
 }
 
 /******************************************************************************/
@@ -28,6 +33,8 @@ void BSP_init(void)
 
     SystemCoreClockUpdate();
     SysTick_Config(SystemCoreClock / BSP_TICKS_PER_SEC);
+
+    NVIC_SetPriority(SysTick_IRQn, 0U);
 
     __enable_irq();
 }
@@ -53,6 +60,7 @@ void BSP_delay(uint32_t ticks)
 
     while ((BSP_tickCtr() - start) < ticks)
     {
+        /* Intentionally empty. */
     }
 }
 
@@ -82,6 +90,12 @@ void BSP_ledGreenOff(void)
 /******************************************************************************/
 {
     GPIOC->BRR = 1U << LED_GREEN;
+}
+
+/******************************************************************************/
+void OS_onStartup(void)
+/******************************************************************************/
+{
 }
 
 /******************************************************************************/

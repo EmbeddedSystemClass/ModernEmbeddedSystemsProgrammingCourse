@@ -7,6 +7,8 @@ OSThread blinky1;
 uint32_t stack_blinky2[40];
 OSThread blinky2;
 
+uint32_t stack_idleThread[40];
+
 void main_blinky1(void);
 void main_blinky2(void);
 
@@ -17,7 +19,7 @@ int main(void)
     __disable_irq();
 
     BSP_init();
-    OS_init();
+    OS_init(stack_idleThread, sizeof(stack_idleThread));
 
     OSThread_start(&blinky1,
         main_blinky1,
@@ -41,9 +43,9 @@ void main_blinky1(void)
     while (1)
     {
         BSP_ledGreenOn();
-        BSP_delay(BSP_TICKS_PER_SEC / 4U);
+        OS_delay(BSP_TICKS_PER_SEC * 1U / 8U);
         BSP_ledGreenOff();
-        BSP_delay(BSP_TICKS_PER_SEC / 4U);
+        OS_delay(BSP_TICKS_PER_SEC * 7U / 8U);
     }
 }
 
@@ -54,8 +56,8 @@ void main_blinky2(void)
     while (1)
     {
         BSP_ledBlueOn();
-        BSP_delay(BSP_TICKS_PER_SEC / 2U);
+        OS_delay(BSP_TICKS_PER_SEC * 1U / 4U);
         BSP_ledBlueOff();
-        BSP_delay(BSP_TICKS_PER_SEC / 2U);
+        OS_delay(BSP_TICKS_PER_SEC * 3U / 4U);
     }
 }

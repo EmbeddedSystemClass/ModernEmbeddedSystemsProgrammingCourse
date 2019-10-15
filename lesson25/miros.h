@@ -1,6 +1,6 @@
 /****************************************************************************
 * MInimal Real-time Operating System (MIROS)
-* version 0.24 (matching lesson 24)
+* version 0.25 (matching lesson 25)
 *
 * This software is a teaching aid to illustrate the concepts underlying
 * a Real-Time Operating System (RTOS). The main goal of the software is
@@ -36,16 +36,26 @@
 /* Thread Control Block (TCB). */
 typedef struct {
     void * sp;
+    uint32_t timeout; /* Timeout delay down-counter. */
 } OSThread;
 
 typedef void (* OSThreadHandler)(void);
 
-void OS_init(void);
+void OS_init(void * stkSto, uint32_t stkSize);
+
+/* Callback to handle the idle condition. */
+void OS_onIdle(void);
 
 /* This function must be called with interrupts DISABLED. */
 void OS_sched(void);
 
 void OS_run(void);
+
+/* Blocking delay. */
+void OS_delay(uint32_t ticks);
+
+/* Process all timeouts. */
+void OS_tick(void);
 
 void OS_onStartup(void);
 

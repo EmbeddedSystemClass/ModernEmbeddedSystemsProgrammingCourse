@@ -35,7 +35,7 @@
 
 /* Thread Control Block (TCB). */
 typedef struct {
-    void * sp;
+    void * sp;        /* Stack pointer. */
     uint32_t timeout; /* Timeout delay down-counter. */
 } OSThread;
 
@@ -49,6 +49,7 @@ void OS_onIdle(void);
 /* This function must be called with interrupts DISABLED. */
 void OS_sched(void);
 
+/* Transfer control to the RTOS to run the threads. */
 void OS_run(void);
 
 /* Blocking delay. */
@@ -57,6 +58,7 @@ void OS_delay(uint32_t ticks);
 /* Process all timeouts. */
 void OS_tick(void);
 
+/* Callback to configure and start interrupts. */
 void OS_onStartup(void);
 
 void OSThread_start(OSThread * me,

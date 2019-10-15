@@ -1,6 +1,6 @@
 /****************************************************************************
 * MInimal Real-time Operating System (MIROS)
-* version 0.23 (matching lesson 23)
+* version 0.24 (matching lesson 24)
 *
 * This software is a teaching aid to illustrate the concepts underlying
 * a Real-Time Operating System (RTOS). The main goal of the software is
@@ -44,6 +44,10 @@ void OS_init(void);
 
 /* This function must be called with interrupts DISABLED. */
 void OS_sched(void);
+
+void OS_run(void);
+
+void OS_onStartup(void);
 
 void OSThread_start(OSThread * me,
     OSThreadHandler threadHandler,

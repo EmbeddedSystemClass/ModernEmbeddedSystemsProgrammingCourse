@@ -1,6 +1,6 @@
 /****************************************************************************
 * MInimal Real-time Operating System (MIROS)
-* version 0.23 (matching lesson 23)
+* version 0.24 (matching lesson 24)
 *
 * This software is a teaching aid to illustrate the concepts underlying
 * a Real-Time Operating System (RTOS). The main goal of the software is
@@ -28,10 +28,18 @@
 * https://www.state-machine.com
 ****************************************************************************/
 
+#include <inttypes.h>
 #include "miros.h"
+#include "qassert.h"
+
+Q_DEFINE_THIS_FILE
 
 OSThread * volatile OS_curr; /* Current thread. */
 OSThread * volatile OS_next; /* Next thread to run. */
+
+OSThread  * OS_thread[32 + 1]; /* Array of threads started so far.  */
+uint8_t  OS_threadNum; /* Number of threads started so far. */
+uint8_t  OS_currIdx;   /* Current thread index for round robin sched. */
 
 /******************************************************************************/
 void OS_init(void)
@@ -45,10 +53,34 @@ void OS_init(void)
 void OS_sched(void)
 /******************************************************************************/
 {
+    ++OS_currIdx;
+
+    if (OS_currIdx == OS_threadNum)
+    {
+        OS_currIdx = 0U;
+    }
+
+    OS_next = OS_thread[OS_currIdx];
+
     if (OS_next != OS_curr)
     {
         *(uint32_t *) 0xE000ED04U = (1U << 28);
     }
+}
+
+/******************************************************************************/
+void OS_run(void)
+/******************************************************************************/
+{
+    /* Callback to configure and start interrupts. */
+    OS_onStartup();
+
+    __disable_irq();
+    OS_sched();
+    __enable_irq();
+
+    /* The following code should never execute. */
+    Q_ERROR();
 }
 
 /******************************************************************************/
@@ -93,6 +125,11 @@ void OSThread_start(OSThread * me,
     {
         *sp = 0xDEADBEEF;
     }
+
+    /* Register the thread with the OS. */
+    Q_ASSERT(OS_threadNum < Q_DIM(OS_thread));
+    OS_thread[OS_threadNum] = me;
+    ++OS_threadNum;
 }
 
 /******************************************************************************/

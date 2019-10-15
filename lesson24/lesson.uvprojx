@@ -338,7 +338,7 @@
               <MiscControls></MiscControls>
               <Define>STM32F10X_MD_VL</Define>
               <Undefine></Undefine>
-              <IncludePath>.;..\qpc\3rd_party\CMSIS\Include;..\qpc\3rd_party\stm32f1-discovery</IncludePath>
+              <IncludePath>.;..\qpc\include;..\qpc\3rd_party\CMSIS\Include;..\qpc\3rd_party\stm32f1-discovery</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>

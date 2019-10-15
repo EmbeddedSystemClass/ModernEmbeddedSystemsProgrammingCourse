@@ -9,6 +9,7 @@
 /* On-board LEDs. */
 #define LED_BLUE  8
 #define LED_GREEN 9
+#define TEST_PIN  10
 
 static uint32_t volatile l_tickCtr;
 
@@ -16,11 +17,15 @@ static uint32_t volatile l_tickCtr;
 void SysTick_Handler(void)
 /******************************************************************************/
 {
+    GPIOC->BSRR = 1U << TEST_PIN;
+
    ++l_tickCtr;
 
     __disable_irq();
     OS_sched();
     __enable_irq();
+
+    GPIOC->BRR = 1U << TEST_PIN;
 }
 
 /******************************************************************************/
@@ -28,15 +33,9 @@ void BSP_init(void)
 /******************************************************************************/
 {
     RCC->APB2ENR |= 0x01U << 4; /* Enable GPIOC clock.  */
-    GPIOC->CRH    = (0x01U << 0) | /* GPIOC8 as PP output. */
-                    (0x01U << 4);  /* GPIOC9 as PP output. */
-
-    SystemCoreClockUpdate();
-    SysTick_Config(SystemCoreClock / BSP_TICKS_PER_SEC);
-
-    NVIC_SetPriority(SysTick_IRQn, 0U);
-
-    __enable_irq();
+    GPIOC->CRH    = (0x01U << 0) | /* GPIOC8  as PP output. */
+                    (0x01U << 4) | /* GPIOC9  as PP output. */
+                    (0x01U << 8);  /* GPIOC10 as PP output. */
 }
 
 /******************************************************************************/
@@ -96,6 +95,10 @@ void BSP_ledGreenOff(void)
 void OS_onStartup(void)
 /******************************************************************************/
 {
+    SystemCoreClockUpdate();
+    SysTick_Config(SystemCoreClock / BSP_TICKS_PER_SEC);
+
+    NVIC_SetPriority(SysTick_IRQn, 0U);
 }
 
 /******************************************************************************/

@@ -1,6 +1,6 @@
 /****************************************************************************
 * MInimal Real-time Operating System (MIROS)
-* version 0.25 (matching lesson 25)
+* version 0.26 (matching lesson 26)
 *
 * This software is a teaching aid to illustrate the concepts underlying
 * a Real-Time Operating System (RTOS). The main goal of the software is
@@ -37,10 +37,12 @@ Q_DEFINE_THIS_FILE
 OSThread * volatile OS_curr; /* Current thread. */
 OSThread * volatile OS_next; /* Next thread to run. */
 
-OSThread  * OS_thread[32 + 1]; /* Array of threads started so far.  */
-uint8_t  OS_threadNum; /* Number of threads started so far. */
-uint8_t  OS_currIdx;   /* Current thread index for round robin sched. */
+OSThread  * OS_thread[32 + 1]; /* Array of threads registered with OS. */
 uint32_t OS_readySet;  /* Bitmask of threads that are ready to run.   */
+uint32_t OS_delayedSet; /* Bitmask of threads that are delayed. */
+
+/* log2 using Count Leading Zeros operation. */
+#define LOG2(x) (32U - __clz(x))
 
 OSThread idleThread;
 void main_idleThread(void);
@@ -53,6 +55,7 @@ void OS_init(void * stkSto, uint32_t stkSize)
     *(uint32_t volatile *) 0xE000ED20U |= (0xFFU << 16);
 
     OSThread_start(&idleThread,
+        0U,
         main_idleThread,
         stkSto,
         stkSize);
@@ -62,23 +65,17 @@ void OS_init(void * stkSto, uint32_t stkSize)
 void OS_sched(void)
 /******************************************************************************/
 {
+    /* OS_next = ... */
     if (OS_readySet == 0U) /* Idle condition? */
     {
-        OS_currIdx = 0U;
+        OS_next = OS_thread[0];
     }
     else
     {
-        do {
-            ++OS_currIdx;
-
-            if (OS_currIdx == OS_threadNum)
-            {
-                OS_currIdx = 1U;
-            }
-        } while ((OS_readySet & (1U << (OS_currIdx - 1U))) == 0U);
+        /* Find runnable thread, with highest priority. */
+        OS_next = OS_thread[LOG2(OS_readySet)];
+        Q_ASSERT(OS_next != ((OSThread *) 0));
     }
-
-    OS_next = OS_thread[OS_currIdx];
 
     /* Trigger PendSV if needed. */
     if (OS_next != OS_curr)
@@ -106,17 +103,27 @@ void OS_run(void)
 void OS_tick(void)
 /******************************************************************************/
 {
-    for (uint8_t n = 1U; n < OS_threadNum; ++n)
-    {
-        if (OS_thread[n]->timeout != 0U)
-        {
-            --OS_thread[n]->timeout;
+    uint32_t workingSet = OS_delayedSet;
 
-            if (OS_thread[n]->timeout == 0U)
-            {
-                OS_readySet |= (1U << (n - 1U));
-            }
+    /* Loop over delayed threads only. */
+    while (workingSet != 0U)
+    {
+        OSThread * t = OS_thread[LOG2(workingSet)];
+        Q_ASSERT(t != ((OSThread *) 0) && (t->timeout != 0U));
+        uint32_t bit;
+
+        bit = 1U << (t->prio - 1U);
+        --t->timeout;
+
+        if (t->timeout == 0U)
+        {
+            /* Make thread ready to run. */
+            OS_readySet   |=  bit;
+            OS_delayedSet &= ~bit;
         }
+
+        /* Remove processed timeouts. */
+        workingSet &= ~bit;
     }
 }
 
@@ -124,18 +131,23 @@ void OS_tick(void)
 void OS_delay(uint32_t ticks)
 /******************************************************************************/
 {
+    uint32_t bit;
+
     /* Never call OS_delay from idle thread. */
     Q_REQUIRE(OS_curr != OS_thread[0]);
 
     __disable_irq();
     OS_curr->timeout = ticks;
-    OS_readySet &= ~(1U << (OS_currIdx - 1U));
+    bit = 1U << (OS_curr->prio - 1U);
+    OS_readySet   &= ~bit;
+    OS_delayedSet |=  bit;
     OS_sched();
     __enable_irq();
 }
 
 /******************************************************************************/
 void OSThread_start(OSThread * me,
+    uint8_t prio,
     OSThreadHandler threadHandler,
     void * stkSto,
     uint32_t stkSize)
@@ -145,6 +157,10 @@ void OSThread_start(OSThread * me,
      * NOTE: Arm Cortex-M stack grows down from hi -> low memory. */
     uint32_t * sp = (uint32_t *)((((uint32_t)stkSto + stkSize) / 8) * 8);
     uint32_t * stk_limit;
+
+    /* Priority must be in range and the priority level must be unused. */
+    Q_REQUIRE((prio < Q_DIM(OS_thread)) &&
+              (OS_thread[prio] == ((OSThread *) 0)));
 
     /* Fabricate Cortex-M stack frame. */
     *(--sp) = (1U << 24);  /* xPSR. */
@@ -178,16 +194,15 @@ void OSThread_start(OSThread * me,
     }
 
     /* Register the thread with the OS. */
-    Q_ASSERT(OS_threadNum < Q_DIM(OS_thread));
-    OS_thread[OS_threadNum] = me;
+    OS_thread[prio] = me;
+    /* Save the thread's priority in the thread's attribute. */
+    me->prio = prio;
 
     /* Make the thread ready to run. */
-    if (OS_threadNum > 0U)
+    if (prio > 0U)
     {
-        OS_readySet |= (1U << (OS_threadNum - 1U));
+        OS_readySet |= (1U << (prio - 1U));
     }
-
-    ++OS_threadNum;
 }
 
 /******************************************************************************/

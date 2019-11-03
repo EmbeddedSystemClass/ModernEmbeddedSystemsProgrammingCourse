@@ -1,6 +1,6 @@
 /****************************************************************************
 * MInimal Real-time Operating System (MIROS)
-* version 0.25 (matching lesson 25)
+* version 0.26 (matching lesson 26)
 *
 * This software is a teaching aid to illustrate the concepts underlying
 * a Real-Time Operating System (RTOS). The main goal of the software is
@@ -37,6 +37,7 @@
 typedef struct {
     void * sp;        /* Stack pointer. */
     uint32_t timeout; /* Timeout delay down-counter. */
+    uint8_t prio;     /* Thread priority. */
 } OSThread;
 
 typedef void (* OSThreadHandler)(void);
@@ -62,6 +63,7 @@ void OS_tick(void);
 void OS_onStartup(void);
 
 void OSThread_start(OSThread * me,
+    uint8_t prio,
     OSThreadHandler threadHandler,
     void * stkSto,
     uint32_t stkSize);
